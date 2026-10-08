@@ -4,6 +4,7 @@
 
 | 主题 | 内容 |
 |---|---|
+| [Milestone 1 开发计划](milestone-1-plan.md) | 确定性编辑闭环的范围、Silo 选型、DSL、实施顺序与验收 |
 | [容量与非功能需求](capacity/README.md) | 业务规模假设、成本、存储、SLO 与资源规划 |
 | [数据模型](data-model/README.md) | 数据选型、所有权、实体关系与字段设计导航 |
 | [多轮对话与状态](conversation/README.md) | Java 业务状态、Python Checkpoint、上下文与取消 |

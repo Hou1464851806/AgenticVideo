@@ -8,7 +8,7 @@
 
 ## 必要依赖（设计选型）
 
-Python + FastAPI + LangGraph；PostgreSQL + pgvector、RabbitMQ、MinIO；LLM、VLM、ASR 与 Embedding 模型；视频分析工具选型见 analysis/README.md。Python 版本与依赖管理工具待确定。
+Python + FastAPI + LangGraph；PostgreSQL + pgvector、RabbitMQ、PGSTY Silo；LLM、VLM、ASR 与 Embedding 模型；视频分析工具选型见 analysis/README.md。Python 版本与依赖管理工具待确定。
 
 ## 运行与验证
 

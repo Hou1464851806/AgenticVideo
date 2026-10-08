@@ -8,7 +8,7 @@
 
 ## 必要依赖（设计选型）
 
-Spring Boot HTTP API；MinIO 预签名上传；RabbitMQ 长任务通信；前端与 Agent Service 是调用方。
+Spring Boot HTTP API；PGSTY Silo 预签名上传；完整架构使用 RabbitMQ 长任务通信，前端与 Agent Service 是调用方。M1 仅接入前端，以下分析消息与 Python 流程属于后续阶段，M1 接口子集见开发计划。
 
 ## 运行与验证
 
@@ -22,6 +22,7 @@ Spring Boot HTTP API；MinIO 预签名上传；RabbitMQ 长任务通信；前端
 
 ## 阅读导航
 
+- [Milestone 1 开发范围、实施步骤与验收](../../docs/milestone-1-plan.md)。
 - [系统总览与需求](../../README.md)。
 - [后端工程](../README.md)。
 - [前端调用方](../../frontend/README.md)。
@@ -69,7 +70,7 @@ sequenceDiagram
     autonumber
     participant U as Vue
     participant J as Java Backend
-    participant S as MinIO
+    participant S as PGSTY Silo
     participant MQ as RabbitMQ
     participant P as Python Analysis Worker
 
