@@ -7,7 +7,7 @@
 
 ## 仓库状态与目录导航
 
-**当前状态：** 已建立目录与设计文档，三个工程尚未初始化，业务功能尚未实现或验证。整体架构沿用 v0.1 基线，对象存储改选 PGSTY Silo，并补充 M1 开发计划；模块文档沿用原章节编号，便于追溯。根文档保留需求、架构、取舍、风险和里程碑，详细设计通过链接进入对应目录。
+**当前状态：** M1 手动确定性剪辑闭环已实现；Java/Vue、独立 Worker、PostgreSQL 与 PGSTY Silo 可在本地 Compose 运行。验证范围与限制见验收记录，Python/Agent 留到后续阶段。整体架构沿用 v0.1 基线，对象存储改选 PGSTY Silo，并补充 M1 开发计划；模块文档沿用原章节编号，便于追溯。根文档保留需求、架构、取舍、风险和里程碑，详细设计通过链接进入对应目录。
 
 ```text
 AgenticVideo/
@@ -47,13 +47,13 @@ AgenticVideo/
 
 ## Milestone 1 开发计划
 
-[Milestone 1 完整计划](docs/milestone-1-plan.md)定义确定性编辑闭环的范围、DSL 子集、接口与数据、实施步骤和验收条件。对象存储由 MinIO 改选 PGSTY Silo，应用继续使用 S3 协议；接入兼容性仍需实测。当前仅完成规划，工程和业务功能尚未实现或验证。
+[Milestone 1 完整计划](docs/milestone-1-plan.md)定义确定性编辑闭环的范围、DSL 子集、接口与数据、实施步骤和验收条件。对象存储由 MinIO 改选 PGSTY Silo，应用继续使用 S3 协议；固定版本接入兼容性已通过 SDK 与浏览器实测。实施状态与实际验证见 [M1 验收记录](docs/milestone-1-acceptance.md)。
 
 ## 运行与验证入口
 
-仓库尚无构建配置、锁文件、启动脚本或 CI，因此没有可确认的安装、启动、构建和业务测试命令。各模块 README 记录设计依赖与已知限制，工程初始化时补充实际命令。
+工程命令见 [Backend](backend/README.md)、[Frontend](frontend/README.md)，基础设施准备见 [infra](infra/README.md)。可重复集成入口见 [scripts](scripts/README.md)，故障与资源配置见 [本地运行指南](docs/m1-operations.md)。
 
-当前文档验证包括内容迁移核对、相对链接与路径、Markdown 结构和 JSON 示例检查；可在仓库根目录执行 `git diff --check` 检查差异格式。容量、成本、性能和故障恢复仍需后续实测。
+当前文档验证包括内容迁移核对、相对链接与路径、Markdown 结构和 JSON 示例检查；可在仓库根目录执行 `git diff --check` 检查差异格式。容量、成本和生产性能仍为设计目标；本地低成本故障与快照恢复结果见验收记录。
 
 ## 0. 系统概述
 

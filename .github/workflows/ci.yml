@@ -1,0 +1,56 @@
+name: checks
+on: [push, pull_request]
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - run: ./mvnw -B -ntp verify
+        working-directory: backend
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install -g pnpm@11.24.0
+      - run: pnpm install --frozen-lockfile
+        working-directory: frontend
+      - run: pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build
+        working-directory: frontend
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install -g pnpm@11.24.0
+      - run: pnpm install --frozen-lockfile
+        working-directory: frontend
+      - run: pnpm exec playwright install --with-deps chromium
+        working-directory: frontend
+      - run: scripts/test-m1.sh
+      - run: scripts/test-media.sh
+      - run: ENV_FILE=.runtime/m1-ci.env scripts/test-silo.sh
+      - run: scripts/test-faults.sh
+      - run: ENV_FILE=.runtime/m1-ci.env scripts/test-api-restart.sh
+      - run: ENV_FILE=.runtime/m1-ci.env COMPOSE_PROJECT_NAME=agenticvideo-m1-test scripts/test-recovery.sh
+      - run: ENV_FILE=.runtime/m1-ci.env COMPOSE_PROJECT_NAME=agenticvideo-m1-test scripts/test-silo-recovery.sh
+      - name: Stop test services while retaining volumes
+        if: always()
+        run: |
+          if [ -f .runtime/m1-ci.env ]; then docker compose --env-file .runtime/m1-ci.env -p agenticvideo-m1-test -f infra/compose.yaml down; fi
+          if [ -f .runtime/empty.env ]; then docker compose --env-file .runtime/empty.env -p agenticvideo-m1-empty -f infra/compose.yaml down; fi

@@ -4,21 +4,31 @@
 
 ## 当前状态与边界
 
-**计划中：** 本目录已建立设计文档，尚未初始化工程或实现业务功能。以下内容来自 v0.1 架构预研，章节编号沿用原设计，便于追溯。容量、预算和性能参数均为设计建议，尚无实测结果。
+已初始化 Vue 3 / TypeScript / Vite 工程；已整合注册登录、项目、直传素材/代理播放、毫秒选段/排序/裁切、比例与只读时间线、严格 DSL 导入、版本/冲突、预览、审批导出、任务轮询和下载。完整浏览器闭环已在真实服务通过，Compose 空卷启动与恢复结果见验收记录。以下 v0.1 章节为后续设计目标。
 
-## 必要依赖（设计选型）
+## 必要依赖与运行
 
-Vue 3 + TypeScript；通过 Java Public API 访问业务状态，通过预签名 URL 将素材直接上传到 PGSTY Silo。M1 拟采用 Vite、Node 24 LTS 与 pnpm，具体版本在初始化时锁定；M1 使用状态轮询，完整架构中的 SSE 留到 M4。
+Node 24.21.0、pnpm 11.24.0；依赖精确版本与 pnpm 锁文件已生成。工作目录 `frontend/`：
 
-## 运行与验证
+```bash
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm format:check
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm exec playwright install chromium
+SILO_BROWSER_FIXTURE=/absolute/ignored/path.json pnpm test:e2e
+M1_E2E=true pnpm exec playwright test uploads.spec.ts workspace.spec.ts
+M1_E2E=true E2E_BASE_URL=http://localhost:5174 pnpm exec playwright test workspace.spec.ts
+```
 
-尚无安装、环境准备、启动、格式检查、静态检查、构建或测试命令；构建配置、依赖版本、锁文件和 CI 待工程初始化时确定。初始化后应在所属工程 README 中补充确切命令与工作目录。
-
-本阶段仅可核对文档内容、相对链接与 Markdown 结构，并在仓库根目录执行 `git diff --check`；这些检查不代表功能验证。
+开发服务为 `http://localhost:5173`，`/api` 默认代理到 `http://localhost:8080`，可通过 `API_URL` 设置内部 API 地址。浏览器直传的预签名地址必须使用浏览器可访问 Host，不能改写签名 URL。
 
 ## 已知限制
 
-本文保留设计目标和示例，不构成已实现的接口、数据库迁移、JSON Schema 或部署配置。模块功能、故障恢复与集成行为仍待实现和验证。
+真实 Silo 浏览器测试需要后端生成短期签名夹具；未提供时测试跳过。单元检查覆盖共享 DSL/OpenAPI；实际 API 响应也按契约验证。真实浏览器已通过上传、MOV 代理、双标签页 409、版本/任务刷新恢复、播放和下载；隐藏页面停止轮询，故障按 2–30 秒退避，状态见 [M1 记录](../docs/milestone-1-acceptance.md)。
 
 ## 阅读导航
 
@@ -34,15 +44,15 @@ Vue 3 + TypeScript；通过 Java Public API 访问业务状态，通过预签名
 
 第一版可以包含：
 
-| 页面 | 功能 |
-|---|---|
-| Project List | 项目列表 |
-| Project Workspace | 项目主工作台 |
-| Asset Library | 素材浏览、上传 |
-| Agent Chat | 自然语言交互 |
-| Timeline Preview | 剪辑时间线 |
-| Render Preview | 成片预览 |
-| Task Panel | 分析与渲染状态 |
+| 页面              | 功能           |
+| ----------------- | -------------- |
+| Project List      | 项目列表       |
+| Project Workspace | 项目主工作台   |
+| Asset Library     | 素材浏览、上传 |
+| Agent Chat        | 自然语言交互   |
+| Timeline Preview  | 剪辑时间线     |
+| Render Preview    | 成片预览       |
+| Task Panel        | 分析与渲染状态 |
 
 ### 6.9.2 工作台布局
 

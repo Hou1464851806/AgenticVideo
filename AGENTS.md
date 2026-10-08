@@ -5,7 +5,7 @@
 ## 1. 项目入口
 
 项目通过上传视频素材和多轮自然语言交互生成、修改剪辑方案，并输出成片。
-设计中的主要工程为 `frontend/`（Vue 3 + TypeScript）、`backend/`（Java + Spring Boot）、`agent-service/`（Python + FastAPI + LangGraph）；这些目录已建立设计文档，工程尚未初始化，业务功能尚未实现或验证。
+设计中的主要工程为 `frontend/`（Vue 3 + TypeScript）、`backend/`（Java + Spring Boot）、`agent-service/`（Python + FastAPI + LangGraph）；Java/Vue 工程已实现 M1 手动剪辑闭环，Python/Agent 留到后续阶段；实际状态见 docs/milestone-1-acceptance.md。
 
 | 需要了解的内容 | 阅读入口 |
 |---|---|
@@ -32,7 +32,7 @@
 
 ## 3. 命令入口
 
-**当前提供的 README 没有确定的安装、启动、构建或测试命令；对应入口尚待工程初始化。**
+**Java/Vue 常用命令见模块 README 和 AGENTS.md，基础设施入口见 infra/README.md；当前命令仅覆盖已建立工程，不能据此宣称业务验收通过。**
 
 - MUST 从实际构建配置、脚本、锁文件和 CI 确认命令，禁止把示例命令或规划入口写成可运行事实。
 - MUST 在初始化工程时，将安装、环境准备、启动、格式检查、静态检查、构建及测试的确切命令写入模块 README，并在模块 AGENTS.md 中列出常用命令及工作目录。
