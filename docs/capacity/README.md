@@ -8,7 +8,7 @@
 
 ## 必要依赖（设计选型）
 
-规划涉及 Java API、Python Agent / Analysis Worker、Render Worker、PostgreSQL、RabbitMQ、MinIO 与 Redis；所有数值需在指定环境中验证。
+规划涉及 Java API、Python Agent / Analysis Worker、Render Worker、PostgreSQL、RabbitMQ、PGSTY Silo 与 Redis；所有数值需在指定环境中验证。
 
 ## 文档验证
 
@@ -269,7 +269,7 @@ HTTP/1.1 202 Accepted
 | 渲染 Worker | 1～2 个，并发数受限 |
 | PostgreSQL | 1 个实例，按 Schema 分离数据所有权 |
 | RabbitMQ | 初期单实例，生产按可靠性要求升级 |
-| MinIO | 1 套对象存储 |
+| PGSTY Silo | 1 套对象存储 |
 | Redis | 缓存、限流和短期状态 |
 
 **以上是建议部署形态，不意味着这些实例数已经能够满足全部 SLO。**

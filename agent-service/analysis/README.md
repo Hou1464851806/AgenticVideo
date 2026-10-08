@@ -8,7 +8,7 @@
 
 ## 必要依赖（设计选型）
 
-Python、FFmpeg、PySceneDetect、WhisperX、VLM、Embedding 模型、PostgreSQL + pgvector、MinIO；具体模型与依赖版本尚未确定。
+Python、FFmpeg、PySceneDetect、WhisperX、VLM、Embedding 模型、PostgreSQL + pgvector、PGSTY Silo；具体模型与依赖版本尚未确定。
 
 ## 运行与验证
 

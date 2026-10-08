@@ -8,7 +8,7 @@
 
 ## 必要依赖（设计选型）
 
-PostgreSQL + pgvector、Redis、MinIO、RabbitMQ、LangGraph Checkpointer；尚无 SQL 迁移和实际 Schema。
+PostgreSQL + pgvector、Redis、PGSTY Silo、RabbitMQ、LangGraph Checkpointer；尚无 SQL 迁移和实际 Schema。
 
 ## 文档验证
 
@@ -39,7 +39,7 @@ PostgreSQL + pgvector、Redis、MinIO、RabbitMQ、LangGraph Checkpointer；尚�
 | PostgreSQL | 用户、项目、会话、任务、剪辑计划 | 支持事务、约束、JSONB |
 | pgvector | 视频片段语义向量 | 与 PostgreSQL 结合，减少基础设施复杂度 |
 | Redis | 缓存、限流、短期协调状态 | 低延迟访问 |
-| MinIO | 原始视频、音频、关键帧、输出视频 | 适合大文件对象存储 |
+| PGSTY Silo | 原始视频、音频、关键帧、输出视频 | 适合大文件对象存储 |
 | RabbitMQ | 任务命令与业务事件 | 异步解耦、确认与重试 |
 | LangGraph Checkpointer | Agent 执行状态 | 线程恢复与持久化 |
 

@@ -1,13 +1,13 @@
 # Agentic Video Editing System — 系统总览与设计导航（预研版）
 
 **项目名称：** Agent 驱动的智能视频剪辑系统  
-**文档版本：** v0.2（按目录拆分，设计基线仍为 v0.1）<br>
+**文档版本：** v0.3（增加 M1 开发计划，对象存储改选 PGSTY Silo）<br>
 **设计阶段：** 需求分析与系统架构预研  
-**技术栈：** Vue 3 + Spring Boot + Python + LangGraph + RabbitMQ + PostgreSQL + MinIO + FFmpeg
+**技术栈：** Vue 3 + Spring Boot + Python + LangGraph + RabbitMQ + PostgreSQL + PGSTY Silo + FFmpeg
 
 ## 仓库状态与目录导航
 
-**当前状态：** 已建立目录与设计文档，三个工程尚未初始化，业务功能尚未实现或验证。本次文档拆分保留 v0.1 架构基线的设计内容；模块文档沿用原章节编号，便于追溯。根文档保留需求、架构、取舍、风险和里程碑，详细设计通过链接进入对应目录。
+**当前状态：** 已建立目录与设计文档，三个工程尚未初始化，业务功能尚未实现或验证。整体架构沿用 v0.1 基线，对象存储改选 PGSTY Silo，并补充 M1 开发计划；模块文档沿用原章节编号，便于追溯。根文档保留需求、架构、取舍、风险和里程碑，详细设计通过链接进入对应目录。
 
 ```text
 AgenticVideo/
@@ -45,6 +45,10 @@ AgenticVideo/
 | 跨模块数据、协议、容量与评测 | [Docs](docs/README.md) |
 | 总体架构、风险、技术取舍与开发顺序 | 本文第 5、7、8 章 |
 
+## Milestone 1 开发计划
+
+[Milestone 1 完整计划](docs/milestone-1-plan.md)定义确定性编辑闭环的范围、DSL 子集、接口与数据、实施步骤和验收条件。对象存储由 MinIO 改选 PGSTY Silo，应用继续使用 S3 协议；接入兼容性仍需实测。当前仅完成规划，工程和业务功能尚未实现或验证。
+
 ## 运行与验证入口
 
 仓库尚无构建配置、锁文件、启动脚本或 CI，因此没有可确认的安装、启动、构建和业务测试命令。各模块 README 记录设计依赖与已知限制，工程初始化时补充实际命令。
@@ -72,7 +76,7 @@ AgenticVideo/
 | Python Agent Service | 剪辑意图理解、视频语义检索、自主规划、工具调用 |
 | RabbitMQ | 跨服务异步任务与事件通信 |
 | PostgreSQL | 业务数据、对话记录、剪辑方案及向量索引 |
-| MinIO | 原始视频、关键帧、音频、中间产物和最终成片 |
+| PGSTY Silo | 原始视频、关键帧、音频、中间产物和最终成片 |
 | FFmpeg | 实际的视频裁切、拼接、转码、音频处理和渲染 |
 
 系统遵循以下职责划分：
@@ -232,7 +236,7 @@ AgenticVideo/
 - Python 调用 Java 的低延迟业务工具使用内部 HTTP API。
 - Java 负责 Video Editing DSL 的权威存储与验证。
 - FFmpeg 渲染集成在 Java 后端系统内，但允许独立部署 Render Worker。
-- 视频文件存入 MinIO，消息队列不传输大文件。
+- 视频文件存入 PGSTY Silo，消息队列不传输大文件。
 
 ### 产品约束
 
@@ -269,7 +273,7 @@ MVP 暂定：
 | ID | 用例 | 参与方 | 前置条件 | 结果 |
 |---|---|---|---|---|
 | UC01 | 创建视频项目 | 用户、Java | 已登录 | 创建 Project |
-| UC02 | 上传视频素材 | 用户、Java、MinIO | 项目存在 | 素材上传成功 |
+| UC02 | 上传视频素材 | 用户、Java、PGSTY Silo | 项目存在 | 素材上传成功 |
 | UC03 | 视频自动分析 | Java、Python | 素材上传完成 | 生成语义索引 |
 | UC04 | 创建视频剪辑方案 | 用户、Agent | 素材可用 | 创建 Edit Plan |
 | UC05 | 长视频精彩片段提取 | Agent | 素材已分析 | 选择候选片段 |
@@ -389,7 +393,7 @@ flowchart TB
 
         PG[("PostgreSQL + pgvector<br/>业务数据 / Agent状态 / 语义索引")]
 
-        OBJ[("MinIO<br/>原始素材 / 中间产物 / 成片")]
+        OBJ[("PGSTY Silo<br/>原始素材 / 中间产物 / 成片")]
 
         REDIS[("Redis<br/>缓存 / 限流")]
 
@@ -440,7 +444,7 @@ flowchart TB
 | Java Render Worker | Java + FFmpeg | 视频处理与导出 |
 | RabbitMQ | RabbitMQ | 任务和事件传递 |
 | PostgreSQL | PostgreSQL + pgvector | 数据持久化与语义检索 |
-| MinIO | S3 Compatible Storage | 视频文件及产物存储 |
+| PGSTY Silo | S3 Compatible Storage | 视频文件及产物存储 |
 | Redis | Redis | 缓存及短期协调状态 |
 
 ### 5.2.2 重要部署说明
@@ -515,7 +519,7 @@ agent-service/
 | 系统编排 | Java Workflow + Python Agent | 全自主 Agent | 限制高成本和不可逆操作 |
 | Agent 架构 | 单 Agent | Multi-Agent | 简化状态与调试 |
 | 数据库 | PostgreSQL + pgvector | MySQL + 专用向量库 | 减少初期组件数量 |
-| 视频存储 | MinIO | 数据库存储大文件 | 视频更适合对象存储 |
+| 视频存储 | PGSTY Silo | 数据库存储大文件 | 视频更适合对象存储 |
 | 渲染方案 | Java + FFmpeg | Python MoviePy / 完全前端渲染 | 渲染结果可控，方便服务端管理 |
 | 剪辑状态 | Versioned DSL | 自然语言描述 / FFmpeg 命令 | 可校验、可修改、可回滚 |
 | 实时通信 | SSE | WebSocket | 当前以服务端单向通知为主 |
@@ -681,13 +685,15 @@ Agent 自主检索
 
 ### Milestone 1：完成确定性视频编辑闭环
 
+详细范围、实施顺序和验收条件见 [M1 开发计划](docs/milestone-1-plan.md)。
+
 先不接入复杂 Agent。
 
 完成：
 
 - Vue 上传视频。
 - Java 保存素材。
-- MinIO 对象存储。
+- PGSTY Silo 对象存储。
 - Video Editing DSL。
 - Java Timeline Compiler。
 - FFmpeg 渲染。

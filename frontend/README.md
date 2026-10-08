@@ -8,7 +8,7 @@
 
 ## 必要依赖（设计选型）
 
-Vue 3 + TypeScript；通过 Java Public API 与 SSE 访问业务状态，通过预签名 URL 将素材直接上传到 MinIO。前端构建工具及包管理器待选定。
+Vue 3 + TypeScript；通过 Java Public API 访问业务状态，通过预签名 URL 将素材直接上传到 PGSTY Silo。M1 拟采用 Vite、Node 24 LTS 与 pnpm，具体版本在初始化时锁定；M1 使用状态轮询，完整架构中的 SSE 留到 M4。
 
 ## 运行与验证
 
@@ -22,6 +22,7 @@ Vue 3 + TypeScript；通过 Java Public API 与 SSE 访问业务状态，通过�
 
 ## 阅读导航
 
+- [Milestone 1 开发范围、实施步骤与验收](../docs/milestone-1-plan.md)。
 - [系统总览与需求](../README.md)。
 - [业务 API 与上传流程](../backend/api/README.md)。
 - [剪辑 DSL 与版本规则](../backend/timeline/README.md)。

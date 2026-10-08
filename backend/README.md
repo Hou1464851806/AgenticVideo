@@ -8,7 +8,7 @@
 
 ## 必要依赖（设计选型）
 
-Java + Spring Boot；PostgreSQL、RabbitMQ、MinIO、Redis；渲染依赖 FFmpeg。JDK、Spring Boot 版本与构建工具待确定。
+Java + Spring Boot；PostgreSQL、RabbitMQ、PGSTY Silo、Redis；渲染依赖 FFmpeg。M1 拟采用 JDK 21、Spring Boot 4.1.x 与 Maven Wrapper，具体版本与兼容性在工程初始化时锁定和验证；RabbitMQ、Redis 不纳入 M1 运行依赖。
 
 ## 运行与验证
 
@@ -22,6 +22,7 @@ Java + Spring Boot；PostgreSQL、RabbitMQ、MinIO、Redis；渲染依赖 FFmpeg
 
 ## 阅读导航
 
+- [Milestone 1 开发范围、实施步骤与验收](../docs/milestone-1-plan.md)。
 - [系统总览与需求](../README.md)。
 - [Public API 与 Internal Tool API](api/README.md)。
 - [Timeline：剪辑计划、DSL 与验证](timeline/README.md)。

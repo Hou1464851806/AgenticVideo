@@ -8,7 +8,7 @@
 
 ## 必要依赖（设计选型）
 
-Java + FFmpeg、MinIO、PostgreSQL、RabbitMQ；复用后端的 DSL Validator 与 Timeline Compiler。
+Java + FFmpeg、PGSTY Silo、PostgreSQL；复用后端的 DSL Validator 与 Timeline Compiler。M1 拟通过 PostgreSQL 持久任务调度独立 Worker，完整架构中的 RabbitMQ 接入留到 M4。
 
 ## 运行与验证
 
@@ -22,6 +22,7 @@ Java + FFmpeg、MinIO、PostgreSQL、RabbitMQ；复用后端的 DSL Validator �
 
 ## 阅读导航
 
+- [Milestone 1 开发范围、实施步骤与验收](../../docs/milestone-1-plan.md)。
 - [系统总览与需求](../../README.md)。
 - [后端工程](../README.md)。
 - [DSL 与计划版本](../timeline/README.md)。
@@ -80,7 +81,7 @@ flowchart TD
     F --> H["进度采集"]
 
     G --> I["质量校验"]
-    I --> J["上传 MinIO"]
+    I --> J["上传 PGSTY Silo"]
     J --> K["更新 Render Job"]
 ```
 

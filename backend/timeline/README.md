@@ -22,6 +22,7 @@ Java + Spring Boot、PostgreSQL JSONB；Python Agent 通过 Internal Tool API �
 
 ## 阅读导航
 
+- [Milestone 1 开发范围、实施步骤与验收](../../docs/milestone-1-plan.md)。
 - [系统总览与需求](../../README.md)。
 - [后端工程](../README.md)。
 - [剪辑计划 API](../api/README.md)。
