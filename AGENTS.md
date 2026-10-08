@@ -5,15 +5,18 @@
 ## 1. 项目入口
 
 项目通过上传视频素材和多轮自然语言交互生成、修改剪辑方案，并输出成片。
-设计中的主要工程为 `frontend/`（Vue 3 + TypeScript）、`backend/`（Java + Spring Boot）、`agent-service/`（Python + FastAPI + LangGraph）；这些是规划目录，不代表已创建或已实现。
+设计中的主要工程为 `frontend/`（Vue 3 + TypeScript）、`backend/`（Java + Spring Boot）、`agent-service/`（Python + FastAPI + LangGraph）；这些目录已建立设计文档，工程尚未初始化，业务功能尚未实现或验证。
 
-| 需要了解的内容     | 阅读入口          |
-| ------------------ | ----------------- |
-| 需求、范围与约束   | README 第 1 章    |
-| 核心用例与接口     | README 第 3 章    |
-| 数据模型与系统架构 | README 第 4、5 章 |
-| 组件详细设计       | README 第 6 章    |
-| 取舍、风险与里程碑 | README 第 7 章    |
+| 需要了解的内容 | 阅读入口 |
+|---|---|
+| 需求、范围与约束 | [根 README 第 1 章](README.md) |
+| 核心用例与接口 | [根 README 第 3 章](README.md)、[API](backend/api/README.md) |
+| 数据模型与系统架构 | [数据模型](docs/data-model/README.md)、[根 README 第 5 章](README.md) |
+| 前端交互与实时反馈 | [Frontend](frontend/README.md) |
+| Java 业务、DSL 与渲染 | [Backend](backend/README.md)、[Timeline](backend/timeline/README.md)、[Rendering](backend/rendering/README.md) |
+| Agent、视频分析、工具与 Worker | [Agent Service](agent-service/README.md) 及其模块导航 |
+| 对话、消息可靠性、容量与评测 | [Docs](docs/README.md) |
+| 取舍、风险与里程碑 | [根 README 第 7 章](README.md) |
 
 - MUST 区分设计目标、实现状态与实测结果；预研文档中的容量、成本和性能目标不能当作已验证能力。
 - MUST 按任务需要阅读设计文档；发现实现与设计冲突时核对需求并说明，不静默改变已确定的设计。
