@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 30,
+    "fps_den": 1,
+    "video_codec": "h264"
+  },
+  "tracks": [
+    {
+      "track_id": "video",
+      "type": "video",
+      "clips": [
+        {
+          "clip_id": "clip_1",
+          "asset_id": "00000000-0000-0000-0000-000000000001",
+          "asset_version": 1,
+          "source_in_ms": 0.5,
+          "source_out_ms": 1500,
+          "timeline_start_ms": 0,
+          "crop_mode": "fit"
+        },
+        {
+          "clip_id": "clip_2",
+          "asset_id": "00000000-0000-0000-0000-000000000002",
+          "asset_version": 1,
+          "source_in_ms": 1000,
+          "source_out_ms": 2000,
+          "timeline_start_ms": 1000,
+          "crop_mode": "center"
+        }
+      ]
+    }
+  ],
+  "constraints": {
+    "target_duration_ms": 2000,
+    "locked_clip_ids": []
+  }
+}

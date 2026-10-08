@@ -4,21 +4,29 @@
 
 ## 当前状态与边界
 
-**计划中：** 本目录已建立设计文档，尚未初始化工程或实现业务功能。以下内容来自 v0.1 架构预研，章节编号沿用原设计，便于追溯。容量、预算和性能参数均为设计建议，尚无实测结果。
+已初始化 JDK 21 / Spring Boot 4.1.1 / Maven 3.9.11 工程，提供格式、静态检查和真实 Silo 接入测试。身份/项目 API 与 Flyway 初始迁移已实现并通过真实 PG 集成；素材上传/校验和独立 Worker 已实现并通过真实浏览器/服务验证，不可变方案版本、审批与持久渲染任务已实现，真实 API 到 PREVIEW/FINAL 已通过针对性验证，M1 完整手动闭环已实现，验收范围与限制见记录。以下 v0.1 章节仍为设计目标。
 
-## 必要依赖（设计选型）
+## 必要依赖与运行
 
-Java + Spring Boot；PostgreSQL、RabbitMQ、PGSTY Silo、Redis；渲染依赖 FFmpeg。M1 拟采用 JDK 21、Spring Boot 4.1.x 与 Maven Wrapper，具体版本与兼容性在工程初始化时锁定和验证；RabbitMQ、Redis 不纳入 M1 运行依赖。
+需要 JDK 21、Docker Compose；M1 不依赖 RabbitMQ、Redis 或 Python。基础设施准备见 [infra](../infra/README.md)。环境变量 `DATABASE_PASSWORD`、`S3_ACCESS_KEY`、`S3_SECRET_KEY` 从本机配置注入；不要将实际凭证写入仓库。
 
-## 运行与验证
+工作目录 `backend/`：
 
-尚无安装、环境准备、启动、格式检查、静态检查、构建或测试命令；构建配置、依赖版本、锁文件和 CI 待工程初始化时确定。初始化后应在所属工程 README 中补充确切命令与工作目录。
+```bash
+./mvnw -B -ntp verify
+./mvnw -B -ntp spotless:apply
+PG_INTEGRATION=true ./mvnw -B -ntp verify
+M1_INTEGRATION=true PG_INTEGRATION=true ./mvnw -B -ntp verify
+./mvnw spring-boot:run
+SILO_CONTRACT=true ./mvnw -B -ntp test -Dtest=StorageContractTest
+SILO_BROWSER_FIXTURE=/absolute/ignored/path.json ./mvnw -B -ntp test -Dtest=BrowserStorageFixtureTest
+```
 
-本阶段仅可核对文档内容、相对链接与 Markdown 结构，并在仓库根目录执行 `git diff --check`；这些检查不代表功能验证。
+SDK 契约使用隔离测试服务与测试管理员身份；浏览器夹具为短期预签名 URL，写入忽略目录。未启用环境变量时相关测试会跳过，不代表集成通过。浏览器端使用同一夹具执行前端 `pnpm test:e2e`。
 
 ## 已知限制
 
-本文保留设计目标和示例，不构成已实现的接口、数据库迁移、JSON Schema 或部署配置。模块功能、故障恢复与集成行为仍待实现和验证。
+M1 采用 Cookie + PBKDF2 + PostgreSQL Session + CSRF，提供上传/媒体校验、不可变版本、确认、预览和正式导出。真实 PG/Silo、浏览器和故障检查见 [M1 记录](../docs/milestone-1-acceptance.md)；支持范围与故障恢复见 [本地运行指南](../docs/m1-operations.md)。真实 4 GB / 120 分钟、生产容量与远端 CI 未验证。
 
 ## 阅读导航
 
@@ -34,7 +42,7 @@ Java + Spring Boot；PostgreSQL、RabbitMQ、PGSTY Silo、Redis；渲染依赖 F
 
 ## 目录划分
 
-`api/`、`timeline/`、`rendering/` 承接已有详细设计。Auth、Project、Asset、Conversation、Agent Task、Workflow、Tool Gateway、Messaging、Observability 仍是同一 Java 工程内的逻辑模块；Java 包名与源代码目录待工程初始化时确定。
+`api/`、`timeline/`、`rendering/` 承接已有详细设计。Auth、Project、Asset、Conversation、Agent Task、Workflow、Tool Gateway、Messaging、Observability 仍是同一 Java 工程内的逻辑模块；已实现包位于 `src/main/java/com/agenticvideo/`，后续模块仍以设计文档为准。
 
 ## 6.1 Java Backend：业务控制中心
 

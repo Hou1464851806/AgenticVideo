@@ -1,0 +1,6 @@
+{
+  "maven:3.9.11-eclipse-temurin-21": "sha256:6fdc855a6ed81d288ca7ca37ac6ff5e9308b612485c0801d70b25a858c83d237",
+  "eclipse-temurin:21-jre-noble": "sha256:000fd431958bc81a24abe1e8e5f0f0fd3ae365a594bd50aadb20696805f9408c",
+  "node:24.21.0-bookworm-slim": "sha256:d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20",
+  "nginx:1.28.0-alpine": "sha256:30f1c0d78e0ad60901648be663a710bdadf19e4c10ac6782c235200619158284"
+}
