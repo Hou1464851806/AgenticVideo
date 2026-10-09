@@ -53,6 +53,8 @@ AgenticVideo/
 
 [M2 完整计划](docs/milestone-2-plan.md)明确中文口播与基本视觉检索、用户确认估算后启动、单素材 ¥5 / 首轮真实验收累计 ¥50 可配置门槛、后台预处理、三层对齐与“结构化片段 + 来源证据 + 文本/向量索引”产物，并划定复合查询支持边界。[候选模型研究](docs/m2-model-research.md)按讨论优先阿里云 Qwen ASR、Qwen3-VL 和 Qwen3-Embedding，记录接口与价格依据；精确选型待资格核验，尚未调用收费模型。M2 先建立 FastAPI 与独立分析 Worker，使用持久化任务与短 HTTP 交接；LangGraph 属于 M3，RabbitMQ 与 SSE 属于 M4。
 
+[模型调用原则](docs/milestone-2-plan.md#33-模型调用协议与统一适配边界)采用 OpenAI 兼容优先、生成类优先 Responses，Embedding 使用专用接口，ASR 保留必要原生协议；Python 上层统一类型契约、预算与错误处理。计划已完成本轮一致性复核，具体兼容能力与模型质量仍待 P0 实测。
+
 ## 运行与验证入口
 
 工程命令见 [Backend](backend/README.md)、[Frontend](frontend/README.md)，基础设施准备见 [infra](infra/README.md)。可重复集成入口见 [scripts](scripts/README.md)，故障与资源配置见 [本地运行指南](docs/m1-operations.md)。

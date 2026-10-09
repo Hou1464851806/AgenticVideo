@@ -10,6 +10,8 @@
 
 M2 计划采用 Python、固定 FFmpeg、PySceneDetect、阿里云 Qwen ASR / Qwen3-VL / Qwen3-Embedding 候选、PostgreSQL + pgvector、PGSTY Silo；具体接口/版本待资格核验。后台预处理产出结构化片段、来源证据与文本/向量索引；时间轴、音画关联和 query/document 编码分别对齐，时间共现不代表语义关系已验证。详细流程、产物与检索边界以[M2 计划](../../docs/milestone-2-plan.md)为准。WhisperX 为原预研本地方案，M2 不强制引入词级对齐；具体依赖版本仍待初始化。
 
+[模型接入计划](../../docs/milestone-2-plan.md#33-模型调用协议与统一适配边界)采用 OpenAI SDK 接入经核验的兼容 HTTP 接口，生成类优先 Responses；Embedding 使用专用接口并保留编码角色，ASR 保留必要原生 SDK/WebSocket 协议。generate/transcribe/embed 在 Python 内提供独立结果类型，共享授权、预算与可追踪调用元数据；具体依赖与能力矩阵在 P0/P1 锁定，当前不可运行。
+
 ## 运行与验证
 
 尚无安装、环境准备、启动、格式检查、静态检查、构建或测试命令；构建配置、依赖版本、锁文件和 CI 待工程初始化时确定。初始化后应在所属工程 README 中补充确切命令与工作目录。

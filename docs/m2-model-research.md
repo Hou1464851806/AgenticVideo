@@ -47,6 +47,20 @@ Qwen-Audio-3.1 streaming 可通过 WebSocket 发送本地录制音频，实时�
 
 工程取舍：M2 用 ASR 文本和独立视觉描述做文本 Embedding，原始音画证据另外保存。它能支持文本语义相似性检索，不能补回取帧或描述阶段遗漏的信息，也不能仅靠向量融合证明音画语义关系。直接多模态 Embedding 留到质量评测定位出具体缺口后再考虑。
 
+### 模型协议统一的范围
+
+本轮讨论决定 **OpenAI 兼容优先，生成类优先 Responses**。OpenAI 官方文档将 Responses 定义为生成接口，采用类型化 `input/output`，结构化输出使用 `text.format`；Embedding 与语音转写各有独立端点。统一 SDK 不意味着这三类请求可以使用同一请求体。[OpenAI Responses 迁移说明](https://developers.openai.com/api/docs/guides/migrate-to-responses)、[Embedding API](https://developers.openai.com/api/reference/resources/embeddings/methods/create)、[转写 API](https://developers.openai.com/api/reference/resources/audio/subresources/transcriptions/methods/create)
+
+阿里云提供 OpenAI 兼容 `/responses`，但官方明确兼容性存在参数和行为差异：未列出的参数会被忽略，目前不支持 `background`；`store` 默认开启，可显式关闭。文档未明确列出所选 `qwen3-vl-flash-2026-01-22` 的完整支持情况，通用图像参数也不能证明该快照已通过。应在 P0 验证多图、实际输出、usage 和限制；未验证前不称“Responses 已可用”，也不因未列出就断言模型完全不可调用。[阿里云 Responses 兼容范围](https://help.aliyun.com/en/model-studio/qwen-api-via-openai-responses)
+
+| 能力 | M2 协议决定 | 资格核查重点 |
+|---|---|---|
+| VLM / 后续生成 | Responses 优先；明确配置的 Chat Completions 为回退 | 所选快照的多图/帧引用、结束状态、输出上限、usage、结构化模式及参数实际生效；无状态调用，关闭存储不等于零保留 |
+| 文本向量 | 专用 OpenAI 兼容 `/embeddings` 优先；必要时 DashScope | 1024 维与批次顺序；兼容端点是否能保留 query/document 和可选 instruct，不假设原生参数自动生效 |
+| ASR | 原生流式 WebSocket，条件备选为异步文件 HTTP | 终句、句/词时间与单位、provider ID、usage、断连和取消；保留来源映射，不为了格式统一换成无时间戳的识别路径 |
+
+ASR 协议事实见[Qwen-Audio 流式客户端事件](https://help.aliyun.com/en/model-studio/qwen-audio-asr-streaming-client-events)；向量参数见[Embedding API 参数](https://help.aliyun.com/zh/model-studio/text-embedding-synchronous-api)。工程上在 Python 内部统一 generate/transcribe/embed 的类型契约、预算与错误分类，供应商协议留在适配器中；不增加独立代理服务。收费重试、SDK 自动重试、usage 缺失和未决账单的行为按[M2 计划 3.3](milestone-2-plan.md#33-模型调用协议与统一适配边界)核验，协议回退不能触发不确定请求的重复收费。
+
 ## 3. 价格参考与预算门槛
 
 以下仅记录 **2026-10-09 核查的华北 2（北京）公开原价**，不包含免费额度、优惠、存储、网络、重试或其他计费项，也不保证用户账号获得相同结算。启动真实调用前必须在账号对应地域再次核查价格、模型权限和账单单位；国际站 USD 价格不能直接当成人民币价格。
@@ -70,8 +84,8 @@ M2 建议先以项目、素材版本、已发布分析版本筛选，再在合�
 
 ## 5. 最终选型资格门槛
 
-1. 核查账号地域、模型权限、真实 endpoint、精确模型 ID、SDK 版本、请求限额、当前价格及素材许可；不把多个地域的能力表拼成一个虚构配置。
+1. 核查账号地域、模型权限、真实 endpoint、精确模型 ID、SDK 版本、请求限额、当前价格及素材许可；建立模型/协议/参数能力矩阵，不把多个地域的能力表拼成一个虚构配置。未列出的参数不默认有效，回退协议显式锁定配置。
 2. 在许可的小样本上验证 Qwen ASR 中文识别、终句和句级定位，含静音、无音轨、短句、块边界和非零音视频起点；将时间映射回源视频，不用响应到达时间。核验 token 计费的可计算上界，无法满足预算契约时再评估文件备选；流式与文件式协议不可混用。
-3. 在少量 JPEG 上验证指定 VLM 快照的多图、帧 ID、输出校验和实际 usage；检索结果只能说明采样画面证据，不承诺帧级动作边界或已发现未采样事件。
-4. 验证中文向量、1024 维、query/document 角色与批次顺序，建立独立检索标注集，比较 ASR/视觉单路、融合与精确搜索基线；另报复合条件诊断，不将时间共现视作语义关系。模型“支持中文”不等于已证明本项目 Recall@K 达标。
+3. 在少量 JPEG 上验证指定 VLM 快照的 Responses 多图、帧 ID、输出校验、结束状态和实际 usage；不通过时核验 Chat Completions 回退，记录最终协议。检索结果只能说明采样画面证据，不承诺帧级动作边界或已发现未采样事件。
+4. 验证中文向量、1024 维、query/document 角色与批次顺序，必要时采用 DashScope 保留编码策略；建立独立检索标注集，比较 ASR/视觉单路、融合与精确搜索基线，覆盖同项目不兼容模型版本；另报复合条件诊断，不将时间共现视作语义关系。模型“支持中文”不等于已证明本项目 Recall@K 达标。
 5. 在 5 元单素材、50 元累计门槛内执行；无足够预算时停止并报告已覆盖范围，不能通过缩小标注集或改写目标宣称验收通过。付费调用与真实数据验收记录在后续实现阶段补充，本文件只完成官方资料研究。
