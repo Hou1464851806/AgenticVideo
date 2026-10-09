@@ -8,7 +8,7 @@
 
 ## 必要依赖（设计选型）
 
-Python、FFmpeg、PySceneDetect、WhisperX、VLM、Embedding 模型、PostgreSQL + pgvector、PGSTY Silo；具体模型与依赖版本尚未确定。
+M2 计划采用 Python、固定 FFmpeg、PySceneDetect、云 ASR/VLM/Embedding、PostgreSQL + pgvector、PGSTY Silo；候选与资格门槛见 M2 计划。WhisperX 为原预研本地方案，M2 不强制引入词级对齐；具体依赖版本仍待初始化。
 
 ## 运行与验证
 
@@ -21,6 +21,8 @@ Python、FFmpeg、PySceneDetect、WhisperX、VLM、Embedding 模型、PostgreSQL
 本文保留设计目标和示例，不构成已实现的接口、数据库迁移、JSON Schema 或部署配置。模块功能、故障恢复与集成行为仍待实现和验证。
 
 ## 阅读导航
+
+- [M2 视频理解与检索计划（尚未实现）](../../docs/milestone-2-plan.md)。
 
 - [系统总览与需求](../../README.md)。
 - [Python 工程](../README.md)。
@@ -66,7 +68,7 @@ flowchart TD
     K --> L["Video Semantic Index"]
 ```
 
-第一阶段可以使用：
+原预研候选如下；M2 云 API 优先，实施取舍以 M2 计划为准：
 
 - FFmpeg：提取视频元数据、音频和关键帧。
 - PySceneDetect：场景及镜头边界检测。

@@ -1,13 +1,13 @@
 # Agentic Video Editing System — 系统总览与设计导航（预研版）
 
 **项目名称：** Agent 驱动的智能视频剪辑系统  
-**文档版本：** v0.3（增加 M1 开发计划，对象存储改选 PGSTY Silo）<br>
+**文档版本：** v0.4（M1 已实现，补充 M2 视频理解与检索计划）<br>
 **设计阶段：** 需求分析与系统架构预研  
 **技术栈：** Vue 3 + Spring Boot + Python + LangGraph + RabbitMQ + PostgreSQL + PGSTY Silo + FFmpeg
 
 ## 仓库状态与目录导航
 
-**当前状态：** M1 手动确定性剪辑闭环已实现；Java/Vue、独立 Worker、PostgreSQL 与 PGSTY Silo 可在本地 Compose 运行。验证范围与限制见验收记录，Python/Agent 留到后续阶段。整体架构沿用 v0.1 基线，对象存储改选 PGSTY Silo，并补充 M1 开发计划；模块文档沿用原章节编号，便于追溯。根文档保留需求、架构、取舍、风险和里程碑，详细设计通过链接进入对应目录。
+**当前状态：** M1 手动确定性剪辑闭环已实现；Java/Vue、独立 Worker、PostgreSQL 与 PGSTY Silo 可在本地 Compose 运行。验证范围与限制见验收记录，M2 计划已制定但尚未实现，Python/Agent 留到后续阶段。整体架构沿用 v0.1 基线，对象存储改选 PGSTY Silo，并补充 M1 开发计划；模块文档沿用原章节编号，便于追溯。根文档保留需求、架构、取舍、风险和里程碑，详细设计通过链接进入对应目录。
 
 ```text
 AgenticVideo/
@@ -48,6 +48,10 @@ AgenticVideo/
 ## Milestone 1 开发计划
 
 [Milestone 1 完整计划](docs/milestone-1-plan.md)定义确定性编辑闭环的范围、DSL 子集、接口与数据、实施步骤和验收条件。对象存储由 MinIO 改选 PGSTY Silo，应用继续使用 S3 协议；固定版本接入兼容性已通过 SDK 与浏览器实测。实施状态与实际验证见 [M1 验收记录](docs/milestone-1-acceptance.md)。
+
+## Milestone 2 开发计划
+
+[M2 完整计划](docs/milestone-2-plan.md)明确中文口播与基本视觉检索、用户确认估算后启动、单素材 ¥5 / 首轮真实验收累计 ¥50 可配置门槛、可靠任务、证据时间轴、分步开发与量化验收。[候选模型研究](docs/m2-model-research.md)记录官方接口与价格依据，尚未调用收费模型。M2 先建立 FastAPI 与独立分析 Worker，使用持久化任务与短 HTTP 交接；LangGraph 属于 M3，RabbitMQ 与 SSE 属于 M4。
 
 ## 运行与验证入口
 
@@ -232,7 +236,7 @@ AgenticVideo/
 - 前端使用 Vue 3 + TypeScript。
 - 业务后端使用 Java + Spring Boot。
 - Agent Service 使用 Python + FastAPI + LangGraph。
-- Java 与 Python 之间的长任务使用 RabbitMQ。
+- 最终架构中 Java 与 Python 之间的长任务使用 RabbitMQ；[M2 分阶段计划](docs/milestone-2-plan.md)先以持久化请求、短 HTTP 受理和独立 Worker 交接，M4 替换传输适配器。
 - Python 调用 Java 的低延迟业务工具使用内部 HTTP API。
 - Java 负责 Video Editing DSL 的权威存储与验证。
 - FFmpeg 渲染集成在 Java 后端系统内，但允许独立部署 Render Worker。
@@ -705,6 +709,8 @@ Agent 自主检索
 
 ### Milestone 2：完成视频理解与语义检索
 
+当前为计划阶段，详细范围与门槛见 [M2 开发计划](docs/milestone-2-plan.md)。用户主动确认估算后启动自动分析，中文口播和基本视觉检索分别验收。
+
 完成：
 
 - 视频自动分析。
@@ -719,6 +725,8 @@ Agent 自主检索
 能够从指定视频中检索用户描述的内容，并返回时间范围。
 
 ### Milestone 3：实现独立 Agent Service
+
+FastAPI 分析服务基础在 M2 建立，本阶段扩展 LangGraph 与 Agent 规划能力。
 
 完成：
 

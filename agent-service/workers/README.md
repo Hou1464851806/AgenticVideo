@@ -8,7 +8,7 @@
 
 ## 必要依赖（设计选型）
 
-Python、RabbitMQ、PostgreSQL 持久化任务、LangGraph Checkpointer；复用 agent/、analysis/ 与 tools/。
+M2：Python、PostgreSQL 持久化任务与租约、分析 provider 适配器；API/Analysis Worker 分进程。原预研的 LangGraph Checkpointer 与 RabbitMQ 分别留到 M3/M4。
 
 ## 运行与验证
 
@@ -22,6 +22,8 @@ Python、RabbitMQ、PostgreSQL 持久化任务、LangGraph Checkpointer；复用
 
 ## 阅读导航
 
+- [M2 视频理解与检索计划（尚未实现）](../../docs/milestone-2-plan.md)。
+
 - [系统总览与需求](../../README.md)。
 - [Python 工程](../README.md)。
 - [Agent 执行逻辑](../agent/README.md)。
@@ -31,4 +33,4 @@ Python、RabbitMQ、PostgreSQL 持久化任务、LangGraph Checkpointer；复用
 
 ## 运行入口规划
 
-Agent API、Agent Worker、Analysis Worker 是可分进程运行的逻辑入口。Consumer 应在任务可靠持久化且可恢复后 ACK，Worker 执行中维护 Checkpoint、心跳与租约；具体交接流程与重试规则统一维护在消息可靠性文档中。现阶段没有可执行的启动脚本。
+Agent API、Agent Worker、Analysis Worker 是可分进程运行的逻辑入口。Consumer 应在任务可靠持久化且可恢复后 ACK，Worker 执行中维护 Checkpoint、心跳与租约；具体交接流程与重试规则统一维护在消息可靠性文档中。M2 先使用 PG 领取分析任务与短 HTTP 持久受理，不依赖 RabbitMQ；代次、租约、取消与预算约束见 M2 计划。现阶段没有可执行的启动脚本。

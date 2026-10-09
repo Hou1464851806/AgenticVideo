@@ -22,6 +22,8 @@ Python + FastAPI；复用 agent/、analysis/ 与 tools/ 的能力；具体 HTTP 
 
 ## 阅读导航
 
+- [M2 视频理解与检索计划（尚未实现）](../../docs/milestone-2-plan.md)。
+
 - [系统总览与需求](../../README.md)。
 - [Python 工程](../README.md)。
 - [Agent 决策组件](../agent/README.md)。
@@ -30,4 +32,4 @@ Python + FastAPI；复用 agent/、analysis/ 与 tools/ 的能力；具体 HTTP 
 
 ## 接口范围
 
-原设计仅确定 FastAPI 技术栈与独立启动入口，没有定义 Python HTTP Endpoint。此目录不新增公共剪辑接口，也不将 RabbitMQ 长任务改为同步 HTTP 请求；具体路由应在工程初始化和接口规范确定后补充。
+原预研仅确定 FastAPI 技术栈与独立启动入口。M2 计划新增内部分析受理、状态、取消、撤销与检索接口：任务持久入库后短 HTTP 返回 202，长任务由独立 Worker 执行，禁止用同步请求或内存队列替代可靠任务。浏览器仍经 Java 访问；RabbitMQ 传输留到 M4。计划路径尚未实现，详细契约在工程初始化时建立。

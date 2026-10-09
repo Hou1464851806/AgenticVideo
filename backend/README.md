@@ -30,6 +30,8 @@ M1 采用 Cookie + PBKDF2 + PostgreSQL Session + CSRF，提供上传/媒体校�
 
 ## 阅读导航
 
+- [M2 视频理解与检索计划（尚未实现）](../docs/milestone-2-plan.md)。
+
 - [Milestone 1 开发范围、实施步骤与验收](../docs/milestone-1-plan.md)。
 - [系统总览与需求](../README.md)。
 - [Public API 与 Internal Tool API](api/README.md)。

@@ -24,6 +24,8 @@ M1 新增规范与契约：[DSL 规范](../../docs/specs/m1-dsl.md)、[共享契
 
 ## 阅读导航
 
+- [M2 视频理解与检索计划（尚未实现）](../../docs/milestone-2-plan.md)。
+
 - [Milestone 1 开发范围、实施步骤与验收](../../docs/milestone-1-plan.md)。
 - [系统总览与需求](../../README.md)。
 - [后端工程](../README.md)。

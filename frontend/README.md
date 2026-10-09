@@ -32,6 +32,8 @@ M1_E2E=true E2E_BASE_URL=http://localhost:5174 pnpm exec playwright test workspa
 
 ## 阅读导航
 
+- [M2 视频理解与检索计划（尚未实现）](../docs/milestone-2-plan.md)。
+
 - [Milestone 1 开发范围、实施步骤与验收](../docs/milestone-1-plan.md)。
 - [系统总览与需求](../README.md)。
 - [业务 API 与上传流程](../backend/api/README.md)。

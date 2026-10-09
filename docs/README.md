@@ -6,6 +6,8 @@
 |---|---|
 | [M1 本地运行与故障](m1-operations.md) | 配置、稳定故障码、租约/清理、迁移与恢复边界 |
 | [验证脚本](../scripts/README.md) | 真实集成、浏览器、媒体、故障与恢复命令 |
+| [Milestone 2 开发计划](milestone-2-plan.md) | 中文口播/基本视觉、预算、任务、索引、UI 与量化验收；尚未实现 |
+| [M2 模型选型依据](m2-model-research.md) | 官方接口、地域价格与资格门槛；尚未付费实测 |
 | [Milestone 1 开发计划](milestone-1-plan.md) | 确定性编辑闭环的范围、Silo 选型、DSL、实施顺序与验收 |
 | [容量与非功能需求](capacity/README.md) | 业务规模假设、成本、存储、SLO 与资源规划 |
 | [数据模型](data-model/README.md) | 数据选型、所有权、实体关系与字段设计导航 |
