@@ -4,27 +4,32 @@
 
 用户已确定：中文口播为主，同时验收基本视觉检索；优先云 API；仅使用允许外传的测试素材；分析由用户看到估算后点击启动；单素材模型费用上限初始为 5 元、首轮真实模型验收累计上限初始为 50 元，均允许配置调整。预算是停止门槛，不是服务价格或分析完成的承诺。
 
+后续讨论将模型方向收敛为阿里云 Qwen ASR、Qwen3-VL 与 Qwen3-Embedding；本次据此修订原 Paraformer 首选。供应商方向已明确，接口/精确版本仍属资格候选。时间与音画关联、产物和检索编码的实施边界统一维护在[M2 计划第 6、7 章](milestone-2-plan.md#6-分析流水线与统一时间轴)。
+
 ## 1. 首轮适配候选
 
 | 能力 | 候选 | 官方资料支持 | M2 接入建议与剩余核验 |
 |---|---|---|---|
-| 中文 ASR | `paraformer-realtime-v2` | Python SDK 支持 `send_audio_frame(bytes)` 发送本地二进制音频；句与字均有 `begin_time` / `end_time`，单位 ms | 先做 16 kHz 单声道 PCM 适配实验；仅持久化终句结果，将块内时间映射回源视频时间轴。需测分块边界、静音、发送节奏和断连；不承诺比实时更快 |
+| 中文 ASR 优先 | `qwen-audio-3.1-asr-flash-streaming` | 直接发送音频流；Qwen-Audio-3.x 默认返回句与词时间戳，官方包含本地文件发送示例 | 先做 16 kHz 单声道 PCM 适配实验；只持久化终句，将块内时间映射回来源。需测边界、静音、发送节奏、断连、token usage 与费用上界；不承诺比实时更快 |
+| 文件 ASR 条件备选 | `qwen3-asr-flash-filetrans` | 异步 DashScope 文件识别，云端可访问 file_url，句级时间；enable_words 可增加字/词级时间 | 仅在私有云暂存与删除/费用方案明确后启用；更细时间不自动代表更高定位精度，分句变化需验证 |
 | 视觉描述 | `qwen3-vl-flash-2026-01-22` | 官方列出该快照，输入包含图像；通用视觉 API 支持多图与 Base64 Data URI | 固定快照优于使用可能更新的别名。传少量带真实帧 ID 的缩放 JPEG；本地严格校验输出，不依赖模型自行给出时间 |
-| 中文文本向量 | `text-embedding-v4` | 支持中文，默认 1024 维，可显式选择维度；最多 10 条/批，单条最多 8192 tokens | 首轮固定 1024 维，并分别保存 ASR 文本和视觉描述向量；查询与索引必须使用同一模型、维度和配置 |
+| 中文文本向量 | `text-embedding-v4`（Qwen3-Embedding 系列） | 支持中文，默认 1024 维，可显式选择维度；最多 10 条/批，单条最多 8192 tokens | 首轮固定 1024 维，分别保存 ASR 文本和视觉描述向量；同一模型/维度，查询与索引使用兼容的 query/document 编码策略 |
 
-ASR 事实见 [Paraformer Python SDK](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk)。视觉事实见 [Qwen3-VL-Flash 模型页](https://help.aliyun.com/zh/model-studio/qwen3-vl-flash)与[视觉 API](https://help.aliyun.com/zh/model-studio/vision)。向量事实见[文本向量同步 API](https://www.alibabacloud.com/help/en/model-studio/text-embedding-synchronous-api)。
+ASR 事实见[实时识别与时间戳说明](https://help.aliyun.com/zh/model-studio/real-time-speech-recognition-user-guide)及[Qwen-ASR 文件接口](https://help.aliyun.com/zh/model-studio/qwen-asr-api-reference)。视觉事实见 [Qwen3-VL-Flash 模型页](https://help.aliyun.com/zh/model-studio/qwen3-vl-flash)与[视觉 API](https://help.aliyun.com/zh/model-studio/vision)。向量系列归属见[Embedding 模型总览](https://help.aliyun.com/zh/model-studio/embedding)，参数见[文本向量同步 API](https://help.aliyun.com/zh/model-studio/text-embedding-synchronous-api)。
 
-官方 ASR 总览将 Paraformer 列为较早一代，并建议条件允许时迁移 Fun-ASR 或 Qwen-ASR。上述 ASR 候选的理由是上传路径和时间戳接口清晰，不能据此宣称中文质量最佳。资格验证阶段应加入一个新版 ASR 候选，以同一标注小样本比较识别、时间定位和费用；新版是否提供满足 M2 要求的句级时间戳须先核查。[ASR 总览](https://help.aliyun.com/zh/model-studio/asr-model)
+上述 ASR 优先级是基于直接上传和时间戳契约的工程判断，不能据此宣称中文质量最佳。原 `paraformer-realtime-v2` 保留为历史比较/必要时回退方向，不默认同时接入多套模型；资格阶段用同一标注小样本比较时间定位、质量与费用后锁定。
 
 ## 2. 接入边界与文档差异
 
 ### ASR 不需要公开本地 Silo
 
-实时 SDK 可以从本地文件分段读取并发送音频。文档建议每包约 100 ms、1–16 KB；模型支持任意采样率，但 `format` 与实际编码必须一致，WAV 必须为 PCM。华北 2（北京）提供工作空间专属域名，应把 endpoint、Workspace ID、模型和密钥作为服务端配置。静音心跳与终句判断遵循 SDK 协议，不应直接把每次中间回调当成新的转录句。[SDK 参数与调用](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-python-sdk)
+Qwen-Audio-3.1 streaming 可通过 WebSocket 发送本地录制音频，实时识别文档给出终句与中间结果区分。默认句/词时间戳能力与 `qwen3-asr-flash-realtime` 不同，后者当前官方明确无时间戳；不能仅凭名称含 Qwen 或 realtime 认为可互换。[实时识别与时间戳说明](https://help.aliyun.com/zh/model-studio/real-time-speech-recognition-user-guide)
+
+具体 endpoint、Workspace ID、模型、SDK 与密钥均为服务端配置。按所选协议校验编码/采样率、发送节奏、终句和 usage，不照搬其他 ASR 的参数；M2 初始提取 mono 16 kHz PCM。普通 `qwen3-asr-flash` 短音频文本识别不直接视为满足句级定位契约，若使用必须另行验证所需时间信息。[ASR 模型与接口差异](https://help.aliyun.com/zh/model-studio/asr-model)
 
 工程推论：Python Worker 从 Silo 读取授权素材、提取有界音频块后主动向云端发送，不把 `localhost`、Compose 主机名或仅内网可访问的签名 URL 交给云服务。通过分块限制内存、取消响应和重试范围；块偏移与源音视频起点差值必须由本地计算，不由模型猜测。实时上传没有已核查的离线加速 SLA，需实测发送速度、总耗时及连接恢复。
 
-备选 `paraformer-v2` 文件识别采用异步提交/查询，`file_urls` 支持 HTTP/HTTPS，当前 REST 文档写明单次 1 个 URL，也有 OSS 临时上传途径。临时 URL 有效期 48 小时，官方不建议用于生产，上传凭证接口还有独立限流。每个请求音轨独立计费，最终任务成功仍须检查子任务状态。[文件 ASR API](https://help.aliyun.com/zh/model-studio/paraformer-recorded-speech-recognition-restful-api)
+备选 `qwen3-asr-flash-filetrans` 使用异步 DashScope 提交/查询，输入为云端可下载的 `file_url`。返回句级时间，`enable_words=true` 可增加字/词级时间，并影响分句策略；适配器应校验毫秒单位、任务状态及结果 URL。其支持长文件的服务限制不等于本仓库已验证相同容量。[文件 ASR API](https://help.aliyun.com/zh/model-studio/qwen-asr-api-reference)
 
 因此文件 ASR 需要服务方实际可下载的 URL，不能复用本地浏览器可访问就认为云端可达。若启用此备选，需另行建立仅存有界测试音频的短期云暂存、访问有效期和删除验证，明确存储/传输费用及数据外传范围。M2 默认优先验证直接二进制上传路径，不要求将本地 Silo 暴露到公网。
 
@@ -36,7 +41,11 @@ ASR 事实见 [Paraformer Python SDK](https://help.aliyun.com/zh/model-studio/pa
 
 ### Embedding 的参数名取决于 API
 
-同步 API 明确支持 1024 维；兼容接口使用 `dimensions`，DashScope 使用 `dimension`，后者还提供 `text_type=query/document`。适配器需匹配所选协议，校验返回维数、有限浮点数、条目序号和 usage。不要把别的模型、维度或文本配置生成的向量放入同一版本索引。[同步 API 参数](https://www.alibabacloud.com/help/en/model-studio/text-embedding-synchronous-api)
+官方把 `text-embedding-v4` 归入 Qwen3-Embedding 系列，但不能进一步推断云 API 与某个开源权重/参数规模完全相同。`qwen3-vl-embedding` 是另一种直接图像/视频等多模态向量路线，不是文本 v4 的别名。[Embedding 模型总览](https://help.aliyun.com/zh/model-studio/embedding)
+
+同步 API 明确支持 1024 维；兼容接口使用 `dimensions`，DashScope 使用 `dimension`，后者还提供 `text_type=query/document`。索引用 document、查询用 query；`instruct` 仅适用于支持它的 query 调用，内容/版本需固定并评测。适配器匹配所选协议，校验维数、有限浮点数、条目序号和 usage。两种角色的配置组合需兼容，不要求参数完全相同；不同模型/空间即使维数相同也不能混索引。[同步 API 参数](https://help.aliyun.com/zh/model-studio/text-embedding-synchronous-api)
+
+工程取舍：M2 用 ASR 文本和独立视觉描述做文本 Embedding，原始音画证据另外保存。它能支持文本语义相似性检索，不能补回取帧或描述阶段遗漏的信息，也不能仅靠向量融合证明音画语义关系。直接多模态 Embedding 留到质量评测定位出具体缺口后再考虑。
 
 ## 3. 价格参考与预算门槛
 
@@ -44,11 +53,12 @@ ASR 事实见 [Paraformer Python SDK](https://help.aliyun.com/zh/model-studio/pa
 
 | 候选 | 本次核查的北京公开原价 | 来源 |
 |---|---|---|
-| `paraformer-realtime-v2` | 音频输入 0.00024 元/秒 | [模型价格](https://help.aliyun.com/zh/model-studio/paraformer-realtime-v2) |
+| `qwen-audio-3.1-asr-flash-streaming` | 输入 6 元/百万 tokens、输出 4.5 元/百万 tokens | [模型价格](https://help.aliyun.com/zh/model-studio/qwen-audio-3-1-asr-flash-streaming) |
+| `qwen3-asr-flash-filetrans` | 音频输入 0.00022 元/秒 | [模型价格](https://help.aliyun.com/zh/model-studio/qwen3-asr-flash-filetrans) |
 | `qwen3-vl-flash-2026-01-22` | 每次输入 ≤32k tokens：输入 0.15 元/百万 tokens、输出 1.5 元/百万 tokens；较大输入另有阶梯 | [快照价格](https://help.aliyun.com/zh/model-studio/qwen3-vl-flash) |
 | `text-embedding-v4` | 文本输入 0.5 元/百万 tokens，Batch File 0.25 元/百万 tokens；首轮不依赖 Batch 折扣 | [模型价格](https://help.aliyun.com/zh/model-studio/text-embedding-v4) |
 
-算术参考：若单次转录输入 10 分钟音频，按上述 ASR 原价计算为 0.144 元；120 分钟为 1.728 元。后者仅用于预算公式，不代表本仓库执行过 120 分钟素材测试，更不代表全部分析可在 5 元内完成。VLM 图像 tokens、描述输出量、向量化和重复调用仍需计入；真实大素材/容量验收不在本次研究范围。
+算术参考：仅对上述文件 ASR，10 分钟音频按 600 × 0.00022 计算为 0.132 元。该秒价不能用于 Qwen-Audio-3.1 streaming；后者需核验音频 token 换算、输出上界与 usage 后才能形成预算公式，不能把短样本均价当硬上界。VLM 图像 tokens、描述输出量、向量化、重复调用及文件暂存费用仍需计入；不代表全部分析可在 5 元内完成。真实大素材/容量验收不在本次研究范围。
 
 预算设计应在调用前保守预留输入与最大输出费用，把 usage、provider request ID、价格版本和结算状态持久化。未知是否已收费的超时不直接无限重试，也不立即释放全部预留额度。单素材和累计验收预算需原子扣减，失败重试同样计入。免费额度只影响实际结算，不作为准许无限调用的依据。
 
@@ -61,7 +71,7 @@ M2 建议先以项目、素材版本、已发布分析版本筛选，再在合�
 ## 5. 最终选型资格门槛
 
 1. 核查账号地域、模型权限、真实 endpoint、精确模型 ID、SDK 版本、请求限额、当前价格及素材许可；不把多个地域的能力表拼成一个虚构配置。
-2. 在许可的小样本上验证中文识别和句级定位，含静音、无音轨、短句、块边界和非零音视频起点。记录标注与实测结果，再决定 ASR 是否需要更换；流式与文件式协议不可混用。
+2. 在许可的小样本上验证 Qwen ASR 中文识别、终句和句级定位，含静音、无音轨、短句、块边界和非零音视频起点；将时间映射回源视频，不用响应到达时间。核验 token 计费的可计算上界，无法满足预算契约时再评估文件备选；流式与文件式协议不可混用。
 3. 在少量 JPEG 上验证指定 VLM 快照的多图、帧 ID、输出校验和实际 usage；检索结果只能说明采样画面证据，不承诺帧级动作边界或已发现未采样事件。
-4. 验证中文向量、1024 维与批次顺序，建立独立检索标注集，比较 ASR/视觉单路、融合与精确搜索基线；模型“支持中文”不等于已证明本项目 Recall@K 达标。
+4. 验证中文向量、1024 维、query/document 角色与批次顺序，建立独立检索标注集，比较 ASR/视觉单路、融合与精确搜索基线；另报复合条件诊断，不将时间共现视作语义关系。模型“支持中文”不等于已证明本项目 Recall@K 达标。
 5. 在 5 元单素材、50 元累计门槛内执行；无足够预算时停止并报告已覆盖范围，不能通过缩小标注集或改写目标宣称验收通过。付费调用与真实数据验收记录在后续实现阶段补充，本文件只完成官方资料研究。

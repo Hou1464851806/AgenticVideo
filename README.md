@@ -51,7 +51,7 @@ AgenticVideo/
 
 ## Milestone 2 开发计划
 
-[M2 完整计划](docs/milestone-2-plan.md)明确中文口播与基本视觉检索、用户确认估算后启动、单素材 ¥5 / 首轮真实验收累计 ¥50 可配置门槛、可靠任务、证据时间轴、分步开发与量化验收。[候选模型研究](docs/m2-model-research.md)记录官方接口与价格依据，尚未调用收费模型。M2 先建立 FastAPI 与独立分析 Worker，使用持久化任务与短 HTTP 交接；LangGraph 属于 M3，RabbitMQ 与 SSE 属于 M4。
+[M2 完整计划](docs/milestone-2-plan.md)明确中文口播与基本视觉检索、用户确认估算后启动、单素材 ¥5 / 首轮真实验收累计 ¥50 可配置门槛、后台预处理、三层对齐与“结构化片段 + 来源证据 + 文本/向量索引”产物，并划定复合查询支持边界。[候选模型研究](docs/m2-model-research.md)按讨论优先阿里云 Qwen ASR、Qwen3-VL 和 Qwen3-Embedding，记录接口与价格依据；精确选型待资格核验，尚未调用收费模型。M2 先建立 FastAPI 与独立分析 Worker，使用持久化任务与短 HTTP 交接；LangGraph 属于 M3，RabbitMQ 与 SSE 属于 M4。
 
 ## 运行与验证入口
 
