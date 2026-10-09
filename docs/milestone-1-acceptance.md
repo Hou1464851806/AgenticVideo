@@ -25,6 +25,17 @@ PostgreSQL 17.6、PGSTY Silo RELEASE.2026-09-16T00-00-00Z 固定 digest；Worker
 
 可重复命令、环境准备与测试隔离约束维护在 [scripts](../scripts/README.md)，运行配置及故障码见 [操作指南](m1-operations.md)。CI 运行相同小夹具/真实集成/故障/恢复脚本；本地执行通过不代表远端 CI 已通过。
 
+## CI 删除状态码回归补充（2026-10-09）
+
+首次 GitHub integration 日志显示，保存方案与删除素材竞争时返回合法的 `422/202`，但 `RenderIntegrationTest` 错误期待 `422/200`。删除接口与 OpenAPI 均约定异步删除返回 202；本地针对性执行已复现同一失败。现已修正断言，保留原并发检查，并增加顺序执行回归，固定覆盖保存先完成的 `201/409` 和删除先完成的 `422/202`，检查素材状态、方案数量及素材引用。
+
+修复后本地执行（JDK 21、Node 24，隔离 `.runtime/test.env`）：
+
+- `M1_INTEGRATION=true ... backend/mvnw -B -ntp -f backend/pom.xml test -Dtest=RenderIntegrationTest`：4 项运行，全部通过，无跳过；省略部分为隔离测试数据库与存储环境变量。
+- `ENV_FILE=.runtime/test.env scripts/test-m1.sh`：Java verify 的 32 项中 22 项运行、10 项专用测试按条件跳过，无失败；格式、Checkstyle、编译与打包通过，2 项上传/工作台浏览器测试通过，文档检查与 `git diff --check` 通过。
+
+此次改动仅涉及测试和本记录，不改变删除接口或业务行为；未重新执行后续媒体、故障和恢复脚本，也未推送或重跑 GitHub CI。本地通过不能代替修复提交的远端 CI 结果。
+
 ## AC01–AC12 对照
 
 | 条件 | 证据与实际行为 |

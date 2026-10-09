@@ -220,7 +220,7 @@ class RenderIntegrationTest {
         int saveStatus = saved.get().statusCode(), deleteStatus = deleted.get().statusCode();
         assertTrue(
             (saveStatus == 201 && deleteStatus == 409)
-                || (saveStatus == 422 && deleteStatus == 200),
+                || (saveStatus == 422 && deleteStatus == 202),
             "Save/delete must have one winner: " + saveStatus + "/" + deleteStatus);
         if (saveStatus == 201)
           assertEquals("MEDIA_READY", user.get("/assets/" + asset).path("status").asText());
@@ -232,6 +232,54 @@ class RenderIntegrationTest {
                   Integer.class,
                   UUID.fromString(asset)));
       }
+    }
+  }
+
+  @Test
+  void saveAndDeleteEnforceBothOrderings() throws Exception {
+    var user = new TestBrowser(port);
+    user.login();
+    for (boolean saveFirst : new boolean[] {true, false}) {
+      String project =
+          user.post("/projects", Map.of("name", "Ordered reference protection"))
+              .path("id")
+              .asText();
+      String asset = upload(user, project, Path.of("../.runtime/media/red.mp4"));
+      var dsl =
+          (ObjectNode)
+              TestBrowser.JSON.readTree(
+                  Files.readString(Path.of("../contracts/fixtures/valid.json")));
+      dsl.path("tracks").get(0).path("clips").forEach(c -> ((ObjectNode) c).put("asset_id", asset));
+      java.util.concurrent.Callable<HttpResponse<String>> save =
+          () ->
+              user.request(
+                  "POST",
+                  "/projects/" + project + "/edit-plans",
+                  Map.of("name", "Ordered", "dsl", dsl),
+                  Map.of("Idempotency-Key", UUID.randomUUID().toString()));
+      if (saveFirst) {
+        assertEquals(201, save.call().statusCode());
+        assertEquals(409, user.request("DELETE", "/assets/" + asset, null, Map.of()).statusCode());
+        assertEquals("MEDIA_READY", user.get("/assets/" + asset).path("status").asText());
+      } else {
+        assertEquals(202, user.request("DELETE", "/assets/" + asset, null, Map.of()).statusCode());
+        var rejected = save.call();
+        assertEquals(422, rejected.statusCode(), rejected.body());
+        assertEquals(
+            "EDIT_PLAN_INVALID", TestBrowser.JSON.readTree(rejected.body()).path("code").asText());
+      }
+      assertEquals(
+          saveFirst ? 1 : 0,
+          jdbc.queryForObject(
+              "select count(*) from revision_asset_refs where asset_id=?",
+              Integer.class,
+              UUID.fromString(asset)));
+      assertEquals(
+          saveFirst ? 1 : 0,
+          jdbc.queryForObject(
+              "select count(*) from edit_plans where project_id=?",
+              Integer.class,
+              UUID.fromString(project)));
     }
   }
 
