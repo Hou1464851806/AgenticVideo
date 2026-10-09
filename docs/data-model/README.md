@@ -8,7 +8,7 @@
 
 ## 必要依赖（设计选型）
 
-PostgreSQL + pgvector、Redis、PGSTY Silo、RabbitMQ、LangGraph Checkpointer；尚无 SQL 迁移和实际 Schema。
+M1 已有 PostgreSQL Flyway 迁移与 Silo；M2 计划增加 pgvector 与 Python agent_schema，保留现有业务表位置，不为旧示意图搬迁表。Redis 不纳入 M2，RabbitMQ/LangGraph Checkpointer 属于后续阶段；分析 Schema 与迁移尚未实现。
 
 ## 文档验证
 
@@ -21,6 +21,8 @@ PostgreSQL + pgvector、Redis、PGSTY Silo、RabbitMQ、LangGraph Checkpointer�
 M1 新增规范与契约：[DSL 规范](../../docs/specs/m1-dsl.md)、[共享契约](../../contracts/README.md)。旧章节保留后续设计目标。
 
 ## 阅读导航
+
+- [M2 视频理解与检索计划（尚未实现）](../milestone-2-plan.md)。
 
 - [系统总览与需求](../../README.md)。
 - [文档索引](../README.md)。

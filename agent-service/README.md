@@ -8,7 +8,7 @@
 
 ## 必要依赖（设计选型）
 
-Python + FastAPI + LangGraph；PostgreSQL + pgvector、RabbitMQ、PGSTY Silo；LLM、VLM、ASR 与 Embedding 模型；视频分析工具选型见 analysis/README.md。Python 版本与依赖管理工具待确定。
+Python + FastAPI + LangGraph；PostgreSQL + pgvector、RabbitMQ、PGSTY Silo；LLM、VLM、ASR 与 Embedding 模型；视频分析工具选型见 analysis/README.md。M2 计划采用 Python 3.12 + uv，先建立 FastAPI/分析 Worker 与 PG 持久任务，LangGraph 留到 M3、RabbitMQ 留到 M4；精确依赖版本与命令在初始化时固定。
 
 ## 运行与验证
 
@@ -21,6 +21,8 @@ Python + FastAPI + LangGraph；PostgreSQL + pgvector、RabbitMQ、PGSTY Silo；L
 本文保留设计目标和示例，不构成已实现的接口、数据库迁移、JSON Schema 或部署配置。模块功能、故障恢复与集成行为仍待实现和验证。
 
 ## 阅读导航
+
+- [M2 视频理解与检索计划（尚未实现）](../docs/milestone-2-plan.md)。
 
 - [系统总览与需求](../README.md)。
 - [api：FastAPI 边界](api/README.md)。
